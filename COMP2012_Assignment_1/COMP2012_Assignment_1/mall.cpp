@@ -16,21 +16,13 @@ Mall::Mall(Mall& another) {
     this->shopHead = Mall::duplicateShopLinkedList(another.shopHead);
 }
 
-void recursive_delete_ll_node(Node* nodePtr) {
-    // recursive base case
-    if (nodePtr->getNext() == nullptr) {
-        return;
-    }
-    // recursive call
-    recursive_delete_ll_node(nodePtr->getNext());
-    // delete operation
-    delete nodePtr->getNext();
-    nodePtr->setNext(nullptr);
-    delete nodePtr;
-}
-
 Mall::~Mall() {
-    recursive_delete_ll_node(this->shopHead);
+    Node* current = this->shopHead;
+    while (current != nullptr) {
+        Node* next = current->getNext();
+        delete current;
+        current = next;
+    }
     this->shopHead = nullptr;
 }
 
@@ -51,18 +43,21 @@ string Mall::getAddress() {
 }
 
 bool Mall::addShop(string name, int shopNumber) {
+    Shop* newShopPtr = new Shop(name, shopNumber);
+    Node* newNodePtr = new Node(newShopPtr, nullptr);
     Node* nodePtr = this->shopHead;
     if (nodePtr != nullptr) {
         // LL not empty
-        for (; nodePtr->getNext() != nodePtr; nodePtr = nodePtr->getNext()) {
+        for (; nodePtr->getNext() != nullptr; nodePtr = nodePtr->getNext()) {
             if (nodePtr->getShop()->getShopNumber() == shopNumber) {
                 return false;
             }
         }
+        nodePtr->setNext(newNodePtr);
+    } else {
+        // LL empty
+        this->shopHead = newNodePtr;
     }
-    Shop* newShopPtr = new Shop(name, shopNumber);
-    Node* newNodePtr = new Node(newShopPtr, nullptr);
-    nodePtr->setNext(newNodePtr);
     return true;
 }
 
@@ -77,7 +72,7 @@ bool Mall::removeShop(int shopNumber) {
             return true;
         }
         // For item 1 to n-2
-        for (; nodePtr->getNext() != nodePtr && nodePtr->getNext()->getNext() != nodePtr; nodePtr = nodePtr->getNext()) {
+        for (; nodePtr->getNext() != nullptr && nodePtr->getNext()->getNext() != nullptr; nodePtr = nodePtr->getNext()) {
             // If item i+1 is target, delete item 1+1, update item i
             if (nodePtr->getNext()->getShop()->getShopNumber() == shopNumber) {
                 delete nodePtr->getNext();

@@ -58,15 +58,27 @@ void Shop::addProduct(string name, ProductType type, float price, int quantityTo
     // Create new product array
     Product** newProducts = new Product* [this->productCount + 1];
     int newProductCount = 0;
-    // Copy and insert new product
-    for (int i = 0; i < this->productCount; i++) {
-        if (newProductPtr->compare(this->products[i]) == -1) {
-            // new product smaller than product[i], insert before product[i]
-            newProducts[newProductCount] = newProductPtr;
+    if (this->productCount == 0) {
+        newProducts[newProductCount] = newProductPtr;
+        newProductCount += 1;
+    } else {
+        bool didInsert = false;
+        // Copy and insert new product
+        for (int i = 0; i < this->productCount; i++) {
+            if (!didInsert && newProductPtr->compare(this->products[i]) == -1) {
+                // new product smaller than product[i], insert before product[i]
+                newProducts[newProductCount] = newProductPtr;
+                newProductCount += 1;
+                didInsert = true;
+            }
+            newProducts[newProductCount] = this->products[i];
             newProductCount += 1;
         }
-        newProducts[newProductCount] = this->products[i];
-        newProductCount += 1;
+        if (!didInsert) {
+            newProducts[newProductCount] = newProductPtr;
+            newProductCount += 1;
+            didInsert = true;
+        }
     }
     // Delete old array
     delete[] this->products;
@@ -150,17 +162,18 @@ bool Shop::updatePrice(string name, float price) {
             break;
         }
     }
+    if (newIndex == -1) { newIndex = this->productCount - 1; }
     // reinsert target if index changed
     if (originalIndex != newIndex) {
         Product* tempProductPtr = nullptr;
         if (originalIndex < newIndex) {
-            for (int i = originalIndex; i <= newIndex; i++) {
+            for (int i = originalIndex; i < newIndex; i++) {
                 tempProductPtr = this->products[i];
                 this->products[i] = this->products[i+1];
                 this->products[i+1] = tempProductPtr;
             }
         } else { // originalIndex > newIndex
-            for (int i = originalIndex; i >= newIndex; i--) {
+            for (int i = originalIndex; i > newIndex; i--) {
                 tempProductPtr = this->products[i];
                 this->products[i] = this->products[i-1];
                 this->products[i-1] = tempProductPtr;
