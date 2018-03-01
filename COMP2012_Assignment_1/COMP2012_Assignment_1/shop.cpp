@@ -77,7 +77,6 @@ void Shop::addProduct(string name, ProductType type, float price, int quantityTo
         if (!didInsert) {
             newProducts[newProductCount] = newProductPtr;
             newProductCount += 1;
-            didInsert = true;
         }
     }
     // Delete old array

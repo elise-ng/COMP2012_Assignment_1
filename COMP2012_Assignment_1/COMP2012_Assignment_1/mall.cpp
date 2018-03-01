@@ -43,23 +43,24 @@ string Mall::getAddress() {
 }
 
 bool Mall::addShop(string name, int shopNumber) {
+    Node* nodePtr = this->shopHead;
+    while (nodePtr != nullptr) {
+        if (nodePtr->getShop()->getShopNumber() == shopNumber) {
+            return false;
+        }
+        if (nodePtr->getNext() == nullptr) {
+            break; // set nodePtr = lastPtr
+        }
+        nodePtr = nodePtr->getNext();
+    }
     Shop* newShopPtr = new Shop(name, shopNumber);
     Node* newNodePtr = new Node(newShopPtr, nullptr);
-    Node* nodePtr = this->shopHead;
-    if (nodePtr != nullptr) {
-        // LL not empty
-        while (nodePtr != nullptr) {
-            if (nodePtr->getShop()->getShopNumber() == shopNumber) {
-                return false;
-            }
-            if (nodePtr->getNext() == nullptr) {
-                nodePtr->setNext(newNodePtr);
-            }
-            nodePtr = nodePtr->getNext();
-        }
-    } else {
+    if (nodePtr == nullptr) {
         // LL empty
         this->shopHead = newNodePtr;
+    } else {
+        // LL not empty
+        nodePtr->setNext(newNodePtr);
     }
     return true;
 }
