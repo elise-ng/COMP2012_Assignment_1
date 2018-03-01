@@ -10,28 +10,10 @@ Mall::Mall(string name, string address) {
     this->shopHead = nullptr;
 }
 
-Node* recursive_copy_ll_node(Node* anotherNodePtr) {
-    // recursive base case
-    if (anotherNodePtr->getNext() == nullptr) {
-        Shop* copyShopPtr = new Shop(*(anotherNodePtr->getShop()));
-        Node* copyNodePtr = new Node(copyShopPtr, nullptr);
-        return copyNodePtr;
-    }
-
-    // recursive call
-    Node* nextCopyNodePtr = recursive_copy_ll_node(anotherNodePtr->getNext());
-
-    // copy operation
-    Shop* copyShopPtr = new Shop(*(anotherNodePtr->getShop()));
-    Node* copyNodePtr = new Node(copyShopPtr, nextCopyNodePtr);
-
-    return copyNodePtr;
-}
-
 Mall::Mall(Mall& another) {
     this->name = another.name;
     this->address = another.address;
-    this->shopHead = recursive_copy_ll_node(another.shopHead);
+    this->shopHead = Mall::duplicateShopLinkedList(another.shopHead);
 }
 
 void recursive_delete_ll_node(Node* nodePtr) {
