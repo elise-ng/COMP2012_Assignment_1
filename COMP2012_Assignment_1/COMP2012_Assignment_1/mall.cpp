@@ -10,17 +10,33 @@ Mall::Mall(string name, string address) {
     this->shopHead = nullptr;
 }
 
+Node* recursive_copy_ll_node(Node* anotherNodePtr) {
+    // recursive base case
+    if (anotherNodePtr->getNext() == nullptr) {
+        Shop* copyShopPtr = new Shop(*(anotherNodePtr->getShop()));
+        Node* copyNodePtr = new Node(copyShopPtr, nullptr);
+        return copyNodePtr;
+    }
+
+    // recursive call
+    Node* nextCopyNodePtr = recursive_copy_ll_node(anotherNodePtr->getNext());
+
+    // copy operation
+    Shop* copyShopPtr = new Shop(*(anotherNodePtr->getShop()));
+    Node* copyNodePtr = new Node(copyShopPtr, nextCopyNodePtr);
+
+    return copyNodePtr;
+}
+
 Mall::Mall(Mall& another) {
     this->name = another.name;
     this->address = another.address;
-    this->shopHead = another.shopHead;
+    this->shopHead = recursive_copy_ll_node(another.shopHead);
 }
 
 void recursive_delete_ll_node(Node* nodePtr) {
     // recursive base case
     if (nodePtr->getNext() == nullptr) {
-        delete nodePtr->getShop();
-        nodePtr->setShop(nullptr);
         return;
     }
     // recursive call
@@ -74,8 +90,6 @@ bool Mall::removeShop(int shopNumber) {
         // LL not empty
         // Item 0
         if (nodePtr->getShop()->getShopNumber() == shopNumber) {
-            delete nodePtr->getShop();
-            nodePtr->setShop(nullptr);
             delete nodePtr;
             this->shopHead = nullptr;
             return true;
@@ -84,8 +98,6 @@ bool Mall::removeShop(int shopNumber) {
         for (; nodePtr->getNext() != nodePtr && nodePtr->getNext()->getNext() != nodePtr; nodePtr = nodePtr->getNext()) {
             // If item i+1 is target, delete item 1+1, update item i
             if (nodePtr->getNext()->getShop()->getShopNumber() == shopNumber) {
-                delete nodePtr->getNext()->getShop();
-                nodePtr->getNext()->setShop(nullptr);
                 delete nodePtr->getNext();
                 nodePtr->setNext(nullptr);
                 return true;
