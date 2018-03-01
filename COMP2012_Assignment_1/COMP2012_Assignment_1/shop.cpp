@@ -105,26 +105,36 @@ bool Shop::removeProduct(string name, int quantityToRemove) {
         }
     }
     if (shouldRemoveTarget) {
-        // Create new product array
-        Product** newProducts = new Product* [this->productCount - 1];
-        int newProductCount = 0;
-        // Copy and remove target
-        for (int i = 0; i < this->productCount; i++) {
-            if (this->products[i]->getQuantity() == 0) {
-                // target found, proceed to delete
-                delete this->products[i];
-                this->products[i] = nullptr;
-                continue;
+        if (this->productCount - 1 == 0) {
+            // No more products after removal
+            delete this->products[0];
+            this->products[0] = nullptr;
+            delete[] this->products;
+            this->products = nullptr;
+            this->productCount = 0;
+            return true;
+        } else {
+            // Create new product array
+            Product** newProducts = new Product* [this->productCount - 1];
+            int newProductCount = 0;
+            // Copy and remove target
+            for (int i = 0; i < this->productCount; i++) {
+                if (this->products[i]->getQuantity() == 0) {
+                    // target found, proceed to delete
+                    delete this->products[i];
+                    this->products[i] = nullptr;
+                    continue;
+                }
+                newProducts[newProductCount] = this->products[i];
+                newProductCount += 1;
             }
-            newProducts[newProductCount] = this->products[i];
-            newProductCount += 1;
+            // Delete old array
+            delete[] this->products;
+            // Update values
+            this->products = newProducts;
+            this->productCount = newProductCount;
+            return true;
         }
-        // Delete old array
-        delete[] this->products;
-        // Update values
-        this->products = newProducts;
-        this->productCount = newProductCount;
-        return true;
     } else {
         // search found nothing
         return false;
