@@ -48,12 +48,15 @@ bool Mall::addShop(string name, int shopNumber) {
     Node* nodePtr = this->shopHead;
     if (nodePtr != nullptr) {
         // LL not empty
-        for (; nodePtr->getNext() != nullptr; nodePtr = nodePtr->getNext()) {
+        while (nodePtr != nullptr) {
             if (nodePtr->getShop()->getShopNumber() == shopNumber) {
                 return false;
             }
+            if (nodePtr->getNext() == nullptr) {
+                nodePtr->setNext(newNodePtr);
+            }
+            nodePtr = nodePtr->getNext();
         }
-        nodePtr->setNext(newNodePtr);
     } else {
         // LL empty
         this->shopHead = newNodePtr;
@@ -63,32 +66,38 @@ bool Mall::addShop(string name, int shopNumber) {
 
 bool Mall::removeShop(int shopNumber) {
     Node* nodePtr = this->shopHead;
-    if (nodePtr != nullptr) {
-        // LL not empty
-        // Item 0
+    Node* prevPtr = nullptr;
+    while (nodePtr != nullptr) {
         if (nodePtr->getShop()->getShopNumber() == shopNumber) {
-            delete nodePtr;
-            this->shopHead = nullptr;
-            return true;
-        }
-        // For item 1 to n-2
-        for (; nodePtr->getNext() != nullptr && nodePtr->getNext()->getNext() != nullptr; nodePtr = nodePtr->getNext()) {
-            // If item i+1 is target, delete item 1+1, update item i
-            if (nodePtr->getNext()->getShop()->getShopNumber() == shopNumber) {
-                delete nodePtr->getNext();
-                nodePtr->setNext(nullptr);
+            // Target found
+            if (prevPtr == nullptr) {
+                // Target is head
+                this->shopHead = nodePtr->getNext();
+                delete nodePtr;
+                nodePtr = nullptr;
+                return true;
+            } else {
+                // Target is not head
+                prevPtr->setNext(nodePtr->getNext());
+                delete nodePtr;
+                nodePtr = nullptr;
                 return true;
             }
+        } else {
+            prevPtr = nodePtr;
+            nodePtr = nodePtr->getNext();
         }
     }
     return false;
 }
 
 Shop* Mall::getShop(int shopNumber) {
-    for (Node* nodePtr = this->shopHead; nodePtr->getNext() != nullptr; nodePtr = nodePtr->getNext()) {
+    Node* nodePtr = this->shopHead;
+    while (nodePtr != nullptr) {
         if (nodePtr->getShop()->getShopNumber() == shopNumber) {
             return nodePtr->getShop();
         }
+        nodePtr = nodePtr->getNext();
     }
     return nullptr;
 }
