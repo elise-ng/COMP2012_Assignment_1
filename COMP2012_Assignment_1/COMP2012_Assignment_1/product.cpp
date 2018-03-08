@@ -44,11 +44,7 @@ bool Product::setQuantity(int quantity) {
 }
 
 int Product::compare(Product *other) {
-    if (this->getPrice() > other->getPrice()) {
-        return 1;
-    } else if (this->getPrice() < other->getPrice()) {
-        return -1;
-    } else {
+    if (fabs(this->getPrice() - other->getPrice()) < 0.01f) {
         if (this->getName() > other->getName()) {
             return 1;
         } else if (this->getName() < other->getName()) {
@@ -56,5 +52,9 @@ int Product::compare(Product *other) {
         } else {
             return 0;
         }
+    } else if (this->getPrice() > other->getPrice()) {
+        return 1;
+    } else {
+        return -1;
     }
 }
